@@ -6,7 +6,8 @@ wait: true                                                      # wait for the c
 wait_timeout: 3600                                              # 60 minutes
 
 default_password: 'AsdQwe123456'                                # a default password for all required passwords which are not specified in the blueprint
-config_recommendation_strategy: 'NEVER_APPLY'
+#config_recommendation_strategy: 'NEVER_APPLY'
+config_recommendation_strategy: 'ALWAYS_APPLY_DONT_OVERRIDE_CUSTOM_VALUES'
 
 cluster_template_file: 'cluster_template.j2'                    # the cluster creation template file
 
@@ -15,27 +16,27 @@ cluster_template_file: 'cluster_template.j2'                    # the cluster cr
 ## database configuration ##                                    # only useful if blueprint is dynamic
 ############################
 
-database: 'embedded'                                            # can be set to 'embedded', 'postgres', 'mysql' or 'mariadb'
+database: 'postgres'                                            # can be set to 'embedded', 'postgres', 'mysql' or 'mariadb'
 database_options:
   external_hostname: ''                                         # if this is empty, Ansible will install and prepare the databases on the ambari-node
-  ambari_db_name: 'ambari'
+  ambari_db_name: 'ambari_db'
   ambari_db_username: 'ambari'
   ambari_db_password: 'bigdata'
-  hive_db_name: 'hive'
+  hive_db_name: 'hive_db'
   hive_db_username: 'hive'
-  hive_db_password: 'hive'
-  oozie_db_name: 'oozie'
+  hive_db_password: 'bigdata'
+  oozie_db_name: 'oozie_db'
   oozie_db_username: 'oozie'
-  oozie_db_password: 'oozie'
-  rangeradmin_db_name: 'ranger'
+  oozie_db_password: 'bigdata'
+  rangeradmin_db_name: 'ranger_db'
   rangeradmin_db_username: 'ranger'
-  rangeradmin_db_password: 'ranger'
-  registry_db_name: 'registry'
+  rangeradmin_db_password: 'bigdata'
+  registry_db_name: 'registry_db'
   registry_db_username: 'registry'
-  registry_db_password: 'registry'
-  streamline_db_name: 'streamline'
+  registry_db_password: 'bigdata'
+  streamline_db_name: 'streamline_db'
   streamline_db_username: 'streamline'
-  streamline_db_password: 'streamline'
+  streamline_db_password: 'bigdata'
 
 ##########################
 ## ranger configuration ##                                      # only useful if blueprint is dynamic
@@ -53,28 +54,73 @@ ranger_options:                                                 # only used if R
 blueprint_name: '{{ cluster_name }}_blueprint'                  # the name of the blueprint as it will be stored in Ambari
 blueprint_file: 'blueprint_dynamic.j2'                          # the blueprint JSON file - 'blueprint_dynamic.j2' is a Jinja2 template that generates the required JSON
 blueprint_dynamic:                                              # properties for the dynamic blueprint - these are only used by the 'blueprint_dynamic.j2' template to generate the JSON
-  - role: "hdp-master"
-    clients: ['ZOOKEEPER_CLIENT', 'HDFS_CLIENT', 'YARN_CLIENT', 'MAPREDUCE2_CLIENT', 'TEZ_CLIENT', 'SLIDER', 'PIG', 'SQOOP', 'HIVE_CLIENT', 'HCAT', 'OOZIE_CLIENT', 'INFRA_SOLR_CLIENT', 'SPARK2_CLIENT']
+  - role: "a"
+    clients: ['ZOOKEEPER_CLIENT', 'HDFS_CLIENT', 'YARN_CLIENT', 'MAPREDUCE2_CLIENT', 'TEZ_CLIENT', 'SLIDER', 'PIG', 'SQOOP', 'HIVE_CLIENT', 'HCAT', 'OOZIE_CLIENT', 'INFRA_SOLR_CLIENT', 'SPARK2_CLIENT', 'HBASE_CLIENT', 'ATLAS_CLIENT', 'HST_AGENT', 'METRICS_MONITOR']
     services:
-      - ZOOKEEPER_SERVER
-      - NAMENODE
-      - SECONDARY_NAMENODE
-      - RESOURCEMANAGER
-      - APP_TIMELINE_SERVER
-      - HISTORYSERVER
-      - SPARK2_JOBHISTORYSERVER
-      - HIVE_SERVER
-      - HIVE_METASTORE
-      - WEBHCAT_SERVER
-      - OOZIE_SERVER
       - AMBARI_SERVER
       - INFRA_SOLR
       - METRICS_COLLECTOR
       - METRICS_GRAFANA
-      - METRICS_MONITOR
-  - role: "hdp-slave"
-    clients: ['ZOOKEEPER_CLIENT', 'HDFS_CLIENT', 'YARN_CLIENT', 'MAPREDUCE2_CLIENT', 'TEZ_CLIENT', 'SLIDER', 'PIG', 'SQOOP', 'HIVE_CLIENT', 'HCAT', 'OOZIE_CLIENT', 'INFRA_SOLR_CLIENT', 'SPARK2_CLIENT']
+      - RANGER_TAGSYNC
+      - RANGER_ADMIN
+      - RANGER_USERSYNC
+      - HST_SERVER
+      - ACTIVITY_EXPLORER
+      - ACTIVITY_ANALYZER
+  - role: "m-1"
+    clients: ['ZOOKEEPER_CLIENT', 'HDFS_CLIENT', 'YARN_CLIENT', 'MAPREDUCE2_CLIENT', 'TEZ_CLIENT', 'SLIDER', 'PIG', 'SQOOP', 'HIVE_CLIENT', 'HCAT', 'OOZIE_CLIENT', 'INFRA_SOLR_CLIENT', 'SPARK2_CLIENT', 'HBASE_CLIENT', 'ATLAS_CLIENT', 'HST_AGENT', 'METRICS_MONITOR']
+    services:
+      - ZOOKEEPER_SERVER
+      - JOURNALNODE
+      - ZKFC
+      - NAMENODE
+      - RESOURCEMANAGER
+      - HBASE_MASTER
+      - APP_TIMELINE_SERVER
+      - HIVE_METASTORE
+      - HIVE_SERVER
+      - HCAT
+      - WEBHCAT_SERVER
+      - HISTORYSERVER
+  - role: "m-2"
+    clients: ['ZOOKEEPER_CLIENT', 'HDFS_CLIENT', 'YARN_CLIENT', 'MAPREDUCE2_CLIENT', 'TEZ_CLIENT', 'SLIDER', 'PIG', 'SQOOP', 'HIVE_CLIENT', 'HCAT', 'OOZIE_CLIENT', 'INFRA_SOLR_CLIENT', 'SPARK2_CLIENT', 'HBASE_CLIENT', 'ATLAS_CLIENT', 'HST_AGENT', 'METRICS_MONITOR']
+    services:
+      - ZOOKEEPER_SERVER
+      - JOURNALNODE
+      - ZKFC
+      - NAMENODE
+      - RESOURCEMANAGER
+      - HIVE_METASTORE
+      - HIVE_SERVER
+      - HCAT
+      - WEBHCAT_SERVER
+      - HIVE_SERVER_INTERACTIVE
+  - role: "m-3"
+    clients: ['ZOOKEEPER_CLIENT', 'HDFS_CLIENT', 'YARN_CLIENT', 'MAPREDUCE2_CLIENT', 'TEZ_CLIENT', 'SLIDER', 'PIG', 'SQOOP', 'HIVE_CLIENT', 'HCAT', 'OOZIE_CLIENT', 'INFRA_SOLR_CLIENT', 'SPARK2_CLIENT', 'HBASE_CLIENT', 'ATLAS_CLIENT', 'HST_AGENT', 'METRICS_MONITOR']
+    services:
+      - ZOOKEEPER_SERVER
+      - JOURNALNODE
+      - OOZIE_SERVER
+      - HBASE_MASTER
+      - LIVY2_SERVER
+      - SPARK2_JOBHISTORYSERVER
+      - ZEPPELIN_MASTER
+      - ATLAS_SERVER
+  - role: "d"
+    clients: ['ZOOKEEPER_CLIENT', 'HDFS_CLIENT', 'YARN_CLIENT', 'MAPREDUCE2_CLIENT', 'TEZ_CLIENT', 'SLIDER', 'PIG', 'SQOOP', 'HIVE_CLIENT', 'HCAT', 'OOZIE_CLIENT', 'INFRA_SOLR_CLIENT', 'SPARK2_CLIENT', 'HBASE_CLIENT', 'ATLAS_CLIENT', 'HST_AGENT', 'METRICS_MONITOR']
     services:
       - DATANODE
       - NODEMANAGER
-      - METRICS_MONITOR
+      - HBASE_REGIONSERVER
+  - role: "e"
+    clients: ['ZOOKEEPER_CLIENT', 'HDFS_CLIENT', 'YARN_CLIENT', 'MAPREDUCE2_CLIENT', 'TEZ_CLIENT', 'SLIDER', 'PIG', 'SQOOP', 'HIVE_CLIENT', 'HCAT', 'OOZIE_CLIENT', 'INFRA_SOLR_CLIENT', 'SPARK2_CLIENT', 'HBASE_CLIENT', 'ATLAS_CLIENT', 'HST_AGENT', 'METRICS_MONITOR']
+    services:
+      - KNOX_GATEWAY
+  - role: "n"
+    clients: ['ZOOKEEPER_CLIENT', 'HDFS_CLIENT', 'YARN_CLIENT', 'MAPREDUCE2_CLIENT', 'TEZ_CLIENT', 'SLIDER', 'PIG', 'SQOOP', 'HIVE_CLIENT', 'HCAT', 'OOZIE_CLIENT', 'INFRA_SOLR_CLIENT', 'SPARK2_CLIENT', 'HBASE_CLIENT', 'ATLAS_CLIENT', 'HST_AGENT', 'METRICS_MONITOR']
+    services:
+      - NIFI_MASTER
+  - role: "k"
+    clients: ['ZOOKEEPER_CLIENT', 'HDFS_CLIENT', 'YARN_CLIENT', 'MAPREDUCE2_CLIENT', 'TEZ_CLIENT', 'SLIDER', 'PIG', 'SQOOP', 'HIVE_CLIENT', 'HCAT', 'OOZIE_CLIENT', 'INFRA_SOLR_CLIENT', 'SPARK2_CLIENT', 'HBASE_CLIENT', 'ATLAS_CLIENT', 'HST_AGENT', 'METRICS_MONITOR']
+    services:
+      - KAFKA_BROKER

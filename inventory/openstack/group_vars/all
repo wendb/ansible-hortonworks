@@ -8,21 +8,52 @@ cloud_config:
     privatekey: ~/.ssh/field.pem
 
 nodes:
-  - role: "hdp-master"
+  - role: "a"
     count: 1
-    image: CentOS 7.2
-    flavor: m3.xlarge
+    image: CentOS73Prepared
+    flavor: m3.large
     public_ip: false
     ambari_server: true
 
-  - role: "hdp-slave"
-    count: 2
-    image: CentOS 7.2
+  - role: "m-1"
+    count: 1
+    image: CentOS73Prepared
     flavor: m3.large
     public_ip: false
 
-  - role: "hdp-edge"
-    count: 0
-    image: CentOS 7.2
-    flavor: m3.medium
+  - role: "m-2"
+    count: 1
+    image: CentOS73Prepared
+    flavor: m3.large
     public_ip: false
+
+  - role: "m-3"
+    count: 1
+    image: CentOS73Prepared
+    flavor: m3.large
+    public_ip: false
+
+  - role: "d"
+    count: 3
+    image: CentOS73Prepared
+    flavor: d2.medium
+    public_ip: false
+
+  - role: "e"
+    count: 1
+    image: CentOS73Prepared
+    flavor: m3.large
+    public_ip: false
+
+  - role: "n"
+    count: 3
+    image: CentOS73Prepared
+    flavor: d2.medium
+    public_ip: false
+
+  - role: "k"
+    count: 3
+    image: CentOS73Prepared
+    flavor: d2.medium
+    public_ip: false
+

@@ -8,6 +8,7 @@ packages:
   - wget                    # wget required by Ambari
   - openssl                 # openssl required by Ambari
   - chrony                  # ntp required by Hadoop
+  - libtirpc-devel          # libtirpc required by Ambari
 
 openjdk_package: java-1.8.0-openjdk-devel
 
